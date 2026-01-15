@@ -125,8 +125,15 @@ static const int BS_DATA[91][13] = {
 static void
 print_help(void) {
     printf("usage: bikramsambat [YYYY_MM_DD]\n");
-    printf("       bikramsambat -h | --help\n");
-    printf("       bikramsambat -v | --version\n");
+    printf(" bikramsambat -h | --help \tTo print help menu\n");
+    printf(" bikramsambat -v | --version\tTo print version\n");
+    printf(" bikramsambat --mt\tTo print month as text\n");
+    printf(" bikramsambat --personal-format\tTo print in author's preferred format");
+}
+
+static void
+print_bs_personal(NepaliDate nd) {
+    printf("%s %02d, %04d B.S.\n", MONTH_NAMES[nd.month - 1], nd.day, nd.year);
 }
 
 static int
@@ -228,7 +235,7 @@ today_bs(void) {
 
     NepaliDate nd = { 2000, 1, 1 };
 
-    while (diff > 0) {
+    while (diff-- > 0) {
         nd.day++;
 
         if (nd.day > days_in_bs_month(nd.year, nd.month)) {
@@ -240,7 +247,6 @@ today_bs(void) {
                 nd.year++;
             }
         }
-        diff--;
     }
 
     return nd;
@@ -250,11 +256,16 @@ int
 main(int argc, char **argv) {
     int y, m, d;
     int month_text = 0;
+    int pf = 0;
 
     // TODO: i hate this.
     // look into arg parsers (if i want this binary to do more)
     if ((argc >= 2 && !strcmp(argv[1], "--mt")) || (argc >= 3 && !strcmp(argv[2], "--mt"))) {
         month_text = 1;
+    }
+
+    if ((argc >= 2 && !strcmp(argv[1], "--personal-format")) || (argc >= 3 && !strcmp(argv[2], "--personal-format"))) {
+        pf = 1;
     }
 
     if (argc >= 2) {
@@ -269,13 +280,21 @@ main(int argc, char **argv) {
         }
     }
 
-    if (argc == 3 || argc == 2) {
-        if (argc == 2 && month_text) {
+    if (argc == 1) {
+        NepaliDate nd = today_bs();
+
+        printf("%04d %02d %02d\n", nd.year, nd.month, nd.day);
+        return 0;
+    }
+
+    if (argc == 2 || argc == 3) {
+        if (argc == 2 && (month_text || pf)) {
             NepaliDate nd = today_bs();
-            if (month_text) {
-                printf("%04d %s %02d\n", nd.year, MONTH_NAMES[nd.month - 1], nd.day);
+
+            if (pf) {
+                print_bs_personal(nd);
             } else {
-                printf("%04d %02d %02d\n", nd.year, nd.month, nd.day);
+                printf("%04d %s %02d\n", nd.year, MONTH_NAMES[nd.month - 1], nd.day);
             }
             return 0;
         }
@@ -299,12 +318,6 @@ main(int argc, char **argv) {
             printf("%04d %02d %02d\n", ad.year, ad.month, ad.day);
         }
 
-        return 0;
-    }
-
-    if (argc == 1) {
-        NepaliDate nd = today_bs();
-        printf("%04d %02d %02d\n", nd.year, nd.month, nd.day);
         return 0;
     }
 
