@@ -18,6 +18,16 @@ typedef struct {
     int day;
 } EngDate;
 
+static const char *MONTH_NAMES[12] = {
+    // NOTE:
+    // this feels so right but looks so wrong :(
+    // question is am i brave enough?
+    //
+    // "Baisakh", "Jeth", "Ashar", "Shawun", "Bhadau", "Ashoj", "Kartik", "Mangsir", "Push", "Magh", "Falgun", "Chait"
+
+    "Baisakh", "Jestha", "Ashad", "Shrawan", "Bhadra", "Ashwin", "Kartik", "Mangsir", "Poush", "Magh", "Falgun", "Chaitra"
+};
+
 static const int BS_DATA[91][13] = {
     { 2000, 30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31 },
     { 2001, 31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30 },
@@ -239,15 +249,34 @@ today_bs(void) {
 int
 main(int argc, char **argv) {
     int y, m, d;
+    int month_text = 0;
 
-    if (argc == 2) {
+    // TODO: i hate this.
+    // look into arg parsers (if i want this binary to do more)
+    if ((argc >= 2 && !strcmp(argv[1], "--mt")) || (argc >= 3 && !strcmp(argv[2], "--mt"))) {
+        month_text = 1;
+    }
+
+    if (argc >= 2) {
         if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
             print_help();
             return 0;
         }
 
-        if (!strcmp(argv[1],"-v") || !strcmp(argv[1],"--version")) {
+        if (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version")) {
             printf("%s\n", VERSION);
+            return 0;
+        }
+    }
+
+    if (argc == 3 || argc == 2) {
+        if (argc == 2 && month_text) {
+            NepaliDate nd = today_bs();
+            if (month_text) {
+                printf("%04d %s %02d\n", nd.year, MONTH_NAMES[nd.month - 1], nd.day);
+            } else {
+                printf("%04d %02d %02d\n", nd.year, nd.month, nd.day);
+            }
             return 0;
         }
 
@@ -264,7 +293,12 @@ main(int argc, char **argv) {
         NepaliDate bs = { y, m, d };
         EngDate ad = bs_to_ad(bs);
 
-        printf("%04d %02d %02d\n", ad.year, ad.month, ad.day);
+        if (month_text) {
+            printf("%04d %s %02d\n", ad.year, MONTH_NAMES[ad.month - 1], ad.day);
+        } else {
+            printf("%04d %02d %02d\n", ad.year, ad.month, ad.day);
+        }
+
         return 0;
     }
 
