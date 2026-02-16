@@ -46,4 +46,4 @@ foreach warning : extra_warnings
 endforeach
 
 sources = files('src/main.c')
-bs = executable('bikramsambat', sources)
+bs = executable('bikramsambat', sources, install: true)
