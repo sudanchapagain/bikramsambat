@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> moved to <https://codeberg.org/sudanchapagain/bikramsambat>
+
 bikramsambat
 ============
 
